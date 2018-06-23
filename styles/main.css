@@ -1,0 +1,198 @@
+
+.hidden {
+    display: none !important;
+}
+
+.center { text-align: center; }
+.right { text-align: right; }
+.justify { text-align: justify; }
+
+/*************************/
+/* site-wide */
+
+.error {
+    color: #0c0;
+}
+
+body {
+    font-size: 90%;
+    filter: sepia(10%);
+    font-family: "Sans-Serif";
+    background-color: #111;
+    color: #fdfdfd;
+    background-image: url(../images/owl.jpg);
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center center;
+    height: 100vh;
+}
+
+table {
+    background-color: rgba(50, 50, 50, 0.5);
+    border-collapse: collapse;
+    width: 100%;
+}
+
+table th {
+    padding: 10px 20px;
+}
+table tr {
+    border-bottom: 1px solid #333
+}
+table td {
+    padding: 5px 15px;
+}
+
+table tbody tr:hover {
+    background-color: #444;
+    color: orange;
+    cursor: pointer;
+}
+
+select {
+    padding: 7px;
+    background-color: rgba(30, 30, 30, 0.5);
+    color: white;
+    border: 1px solid #111;
+}
+option {
+    background-color: rgba(20, 20, 20, 0.8);
+}
+
+input
+{
+    padding: 7px;
+    background-color: rgba(230, 230, 230, 0.1);
+    color: white;
+    border: 1px solid #111;
+}
+
+button {
+    padding: 8px 15px;
+    color: white;
+    background: linear-gradient(to right, #700, #d44);
+    border: solid 1px #111;
+    border-radius: 5px;
+}
+button:active {
+    display: relative;
+    background: linear-gradient(to right, #900, #e44);
+    border: solid 1px #111;
+}
+button.small {
+    font-size: 12px;
+    background: linear-gradient(to right, #300, #544);
+}
+button.small:active {
+    background: linear-gradient(to right, #600, #944);
+}
+
+a {
+    color: #d44;
+}
+
+a.bracket::before { content: "["; }
+a.bracket::after  { content: "]"; }
+
+/*************************/
+#checkout-container {
+    background-color: rgba(50, 50, 50, .5);
+    padding: 10px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+#checkout-container .static {
+    display: inline-block;
+    margin: 5px;
+    margin-left: 10px;
+    font-weight: bold;
+}
+
+/*************************/
+
+#header {
+    margin: 10px;
+    margin-bottom: 30px;
+}
+
+.site-name {
+    font-size: 80px;
+    font-family: Eater;
+    padding: 0px;
+    margin: 0px;
+}
+
+#search-container {
+    margin: 10px auto;
+    padding: 10px;
+}
+#search-container table#result {
+}
+
+#search-container .page-nav a {
+    color: orange;
+    text-decoration: none;
+    text-align: center;
+    display: inline-block;
+    margin: 2px !important;
+    padding: 10px 15px;
+    width: 30px;
+    border-radius: 3px;
+    background-color: #222;
+}
+#search-container .page-nav a.sel {
+    background-color: #333;
+    color: yellow;
+}
+
+#search-input {
+    text-align: center;
+}
+
+
+#catalog-container {
+    max-width: 700px;
+    min-height: 200px;
+    margin: 0px auto;
+}
+
+#card-catalog {
+    color: black;
+    background-color: white;
+    border: 1px solid gray;
+    display: grid;
+    grid-template-columns: 80px repeat(3, 1fr);
+    grid-template-rows: repeat(10, 1fr);
+    padding: 10px;
+}
+
+#card-catalog > * {
+    grid-column: 2 / 5;
+}
+
+#card-catalog .code {
+    grid-row: 1 / 4;
+    grid-column: 1 / 2;
+}
+
+#card-catalog .subject {
+    font-weight: bold;
+}
+
+#notification {
+    position: fixed;
+    top: 50px;
+    right: 0px;
+    width: 300px;
+    padding: 30px;
+    padding-top: 20px;
+    background-color: rgba(80, 60, 30, 0.80);
+}
+#notification .panel {
+    margin: 0px;
+    padding: 0px;
+    top: 12px;
+    left: 15px;
+    position: relative;
+}

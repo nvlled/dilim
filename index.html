@@ -2,17 +2,147 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <title>Hello World!</title>
+    <title></title>
+    <link rel="stylesheet" href="styles/normalize.css">
+    <link rel="stylesheet" href="styles/fonts.css">
+    <link rel="stylesheet" href="styles/loading.css">
+    <link rel="stylesheet" href="styles/main.css">
   </head>
   <body>
-    <h1>Hello World!</h1>
-    <!-- All of the Node.js APIs are available in this renderer process. -->
-    We are using Node.js <script>document.write(process.versions.node)</script>,
-    Chromium <script>document.write(process.versions.chrome)</script>,
-    and Electron <script>document.write(process.versions.electron)</script>.
+
+    <div id="header" class="center">
+        <h1 class="site-name">DiLiM</h1>
+        <div class="site-desc">
+            Digital Library Management 
+        </div>
+    </div>
+
+    <div id="loading" class="center">
+        <div class="img"></div>
+        <h3 class="caption"></h3>
+    </div>
+
+    <div id="checkout-container" class="hidden">
+        <h2>
+            Checkout Book
+            <span class="right">
+                <button class="small cancel">cancel</button>
+            </span>
+        </h2>
+        <label>Call Number</label>
+        <div class="static call_number">5001238</div>
+        <br>
+        <label>Book Details</label>
+        <div class="static book">The Book by Author</div>
+        <br>
+        <label>Current Date</label>
+        <div class="static date">2018-6-17</div>
+        <br>
+        <div>
+            <input class="borrower-name" placeholder="Borrower's Name">
+            <button class="checkout">submit</button>
+        </div>
+        <div class="error"></div>
+    </div>
+
+    <div id="search-container" class="hidden">
+        <form id="search">
+            <div id="search-input">
+            <input name="query" placeholder="search term">
+            <select name="type">
+                <option value="book_title">Title of book</option>
+                <option value="subject">Subject of book/Tags</option>
+                <option value="author">Name of Author</option>
+                <option value="publisher">Publisher</option>
+                <option value="call_number">Call Number</option>
+            </select>
+            <label>
+                <input type="checkbox" name="exact">
+                <span>exact match<span>
+            </label>
+            </div>
+            <p class="result-count center">
+                search result count: <span class="n">0</span>
+            </p>
+            <br>
+
+            <table id="result">
+                <thead class="hidden"><tr></tr></thead>
+                <tbody></tbody>
+            </table>
+            <div class="page-nav justify hidden">
+                <a class="first" href="#">|<</a><a class="prev" href="#"><</a><span class="nums"><a class="" href="#">1</a><a class="" href="#">2</a> <a class="sel" href="#">3</a><a class="" href="#">4</a>
+                </span><a class="next" href="#">></a><a class="last" href="#">>|</a>
+            </div>
+        </form>
+    </div>
+
+    <div id="catalog-container" class="hidden">
+        <div class="right">
+            <button class="back">back</button>
+            <button class="print">print</button>
+            <button class="checkout">checkout book</button>
+        </div>
+        <div id="card-catalog">
+            <div class="call_number code">
+                172.23<br>
+                .B632
+            </div>
+            <div class="subject">
+                Presidents-politics and governments 
+            </div>
+            <div class="book_title title">
+                Presidential Campaign
+            </div>
+            <div class="author">
+                Boller, Paul
+            </div>
+            <div class="publisher">
+                University Press
+            </div>
+        </div>
+        <div class="copies-available right">
+            <div>Available copies:
+                <span class="avail_copies n">0</span>
+            </div>
+            <div>Total number of copies:
+                <span class="number_of_copies n">0</span>
+            </div>
+        </div>
+        <br>
+        <div>
+            <table id="borrows">
+                <thead class="">
+                    <tr>
+                        <td>Borrower</td>
+                        <td>Date Borrowed</td>
+                        <td>Date Returned</td>
+                        <td></td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="templ">
+                        <td class="borrower"></td>
+                        <td class="date_borrowed"></td>
+                        <td class="date_returned"></td>
+                        <td class="actions">
+                            <a href="#" class="return bracket">return</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div id="notification">
+        <div class="panel right">
+            <a href="#">✗</a>
+        </div>
+        <div class="message">
+            initializing
+        </div>
+    </div>
 
     <script>
-      // You can also require other files to run in this process
       require('./renderer.js')
     </script>
   </body>

@@ -1,0 +1,10 @@
+
+@font-face {
+    font-family: 'Eater';
+    font-style: normal;
+    font-weight: 400;
+    src: local('Eater'), 
+        local('Eater-Regular'), 
+        url(eater-regular-font.ttf) format('truetype');
+}
+
