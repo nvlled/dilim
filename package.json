@@ -23,6 +23,8 @@
     "better-sqlite3": "^4.1.4",
     "bluebird": "^3.5.1",
     "chokidar": "^2.0.4",
+    "classify2": "0.0.2",
+    "ddcsum": "^1.1.1",
     "squel": "^5.12.1",
     "xlsx": "^0.12.13"
   }

@@ -43,8 +43,10 @@ function loadForm(tableData) {
     let pageNav = loadPageNavDom();
     let borrowerTable = loadBorrowerTable();
     let checkoutForm = loadCheckoutForm(checkoutContainer);
+    let generatorForm = loadCallNumGenForm(generatorContainer);
     let pager = util.createPager(30);
 
+    generatorForm.loadDatalist();
     initNotification();
     hideNotification();
 
@@ -216,6 +218,7 @@ function loadForm(tableData) {
                     date_borrowed,
                 });
                 inputName.value = "";
+                showNotification("`" + book.book_title + "` lent to " + borrower);
 
                 return true;
             },
@@ -300,6 +303,62 @@ function loadForm(tableData) {
                     this.nums.appendChild(a);
                 }
             },
+        }
+    }
+
+    function loadCallNumGenForm(container) {
+        let classNum = dom.sel("input.ddc-classnum", container);
+        let callNum = dom.sel("input.call-num", container);
+        let cutterNum = dom.sel("input.cutter-num", container);
+        let fname = dom.sel("input.firstname", container);
+        let lname = dom.sel("input.lastname", container);
+        let heading = dom.sel("input.ddc-heading", container);
+        let title = dom.sel("input.title", container);
+        let year = dom.sel("input.year", container);
+        let copyNum = dom.sel("input.copy-num", container);
+        let datalist = dom.sel("datalist", container);
+
+        let ddcsum = require("ddcsum");
+        let summary = ddcsum.data;
+        let generate = () => {
+            console.log("generating numbers");
+            let firstname = fname.value;
+            let lastname  = lname.value;
+            cutterNum.value = ddcsum.generateCutterNumber(lastname, firstname); 
+            let args = {
+                title: title.value,
+                copyNumber: copyNum.value,
+                classNumber: classNum.value,
+                publishYear: year.value,
+                author: { lastname, firstname },
+            }
+            console.log("args", args);
+            callNum.value = ddcsum.generateCallNumber(args);
+        }
+
+        fname.onchange = generate;
+        lname.onchange = generate;
+        title.onchange = generate;
+        year.onchange = generate;
+        copyNum.onchange = generate;
+
+        classNum.onchange = function(e) {
+            let headingText = summary[this.value.trim()];
+            heading.value = headingText || "";
+            generate();
+        }
+
+        return {
+            loadDatalist() {
+                datalist.innerHTML = "";
+                for (let [classNum, heading] of Object.entries(summary)) {
+                    let opt = dom.create("option");
+                    opt.value = classNum;
+                    opt.textContent = heading;
+                    datalist.appendChild(opt);
+                }
+            },
+
         }
     }
 

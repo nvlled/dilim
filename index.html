@@ -4,16 +4,21 @@
     <meta charset="UTF-8">
     <title></title>
     <link rel="stylesheet" href="styles/normalize.css">
+    <link rel="stylesheet" href="styles/fontawesome-all.min.css">
     <link rel="stylesheet" href="styles/fonts.css">
     <link rel="stylesheet" href="styles/loading.css">
     <link rel="stylesheet" href="styles/main.css">
   </head>
   <body>
-
     <div id="header" class="center">
-        <h1 class="site-name">DiLiM</h1>
+        <h1 class="site-name">
+            <a href="index.html">DiLiM</a>
+        </h1>
         <div class="site-desc">
             Digital Library Management 
+            <a href="index.html" class="reload">
+                <i class="fas fa-sync"></i>
+            </a>
         </div>
     </div>
 
@@ -124,15 +129,26 @@
                     <tr class="templ">
                         <td class="borrower"></td>
                         <td class="date_borrowed"></td>
-                        <td class="date_returned"></td>
-                        <td class="actions">
-                            <a href="#" class="return bracket">return</a>
+                        <td class="">
+                            <span class="date_returned"></span>
+                            <a href="#" class="return bracket">return book</a>
                         </td>
                     </tr>
                 </tbody>
             </table>
         </div>
     </div>
+
+    <footer>
+        Initial Prototype for Cayambanan National Highschool
+
+        <br><br>
+
+        Designed and created by Ronald Casili (github.com/nvlled)<br>
+        For inquiries, contact through email with nvlled@gmail.com <br>
+        or through mobile phone with 09052182048
+    </footer>
+
     <div id="notification">
         <div class="panel right">
             <a href="#">✗</a>
