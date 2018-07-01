@@ -74,6 +74,15 @@ let newXlsBorrowers = async (filename=config.borrowersFile) => {
         list(bookId) {
             return table.body.filter(row => {
                 return row.call_number == bookId;
+            }).sort(function(r1, r2) {
+                let k = "date_borrowed";
+                let k2 = "date_returned";
+
+                if (r1[k] != r2[k])
+                    return util.compareSort(k, r1, r2);
+
+                return util.compareSort(k2, r1, r2);
+
             });
         },
 

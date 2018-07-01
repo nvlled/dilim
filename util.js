@@ -224,6 +224,14 @@ function wordMatch(needle, haystack) {
     });
 }
 
+function compareSort(k, obj1, obj2) {
+    if (obj1[k] == obj2[k])
+        return 0;
+    if (obj1[k] < obj2[k])
+        return 1;
+    return -1;
+}
+
 module.exports = {
     cellpos,
     asyncLoop,
@@ -236,6 +244,7 @@ module.exports = {
     mapNodeText,
     currentDate,
     wordMatch,
+    compareSort,
 }
 
 
