@@ -27,6 +27,61 @@
         <h3 class="caption"></h3>
     </div>
 
+    <div id="generator-container" class="hidden">
+        <h2>
+            Book Details
+            <span class="right">
+                <button class="small cancel">cancel</button>
+            </span>
+        </h2>
+        <div>
+            <label>Class Number</label>
+            <input list="summary" class="ddc-classnum" placeholder="000" size="3">
+            <input class="ddc-heading" readonly placeholder="―" size="50">
+            <datalist id="summary"></datalist>
+        </div>
+        <div>
+            <label>Author</label>
+            <input class="firstname" placeholder="firstname" size="35">
+        </div>
+        <div>
+            <label></label>
+            <input class="lastname" placeholder="lastname" size="35">
+        </div>
+
+        <br>
+
+        <div>
+            <label>Book Title</label>
+            <input class="title" placeholder="―" size="36">
+        </div>
+        <div>
+            <label>Publish Year</label>
+            <input class="year" placeholder="20XX" size="4">
+            <label class="hidden ">Copy Number</label>
+            <input class="hidden copy-num" placeholder="" size="2">
+        </div>
+        <div>
+        </div>
+        <br>
+        <div>
+            <label>Cutter Number</label>
+            <input class="cutter-num" readonly placeholder="―" size="10">
+        </div>
+        <div>
+            <label>Call Number</label>
+            <input class="call-num" placeholder="―" size="35">
+        </div>
+        <div>
+            <label></label>
+            <button class="submit">submit</button>
+        </div>
+        <div>
+            <label></label>
+            <span class="error"></span>
+        </div>
+    </div>
+
     <div id="checkout-container" class="hidden">
         <h2>
             Checkout Book
@@ -71,10 +126,14 @@
             </p>
             <br>
 
+            <div class="right">
+                <button class="add-book">add book</button>
+            </div>
             <table id="result">
                 <thead class="hidden"><tr></tr></thead>
                 <tbody></tbody>
             </table>
+
             <div class="page-nav justify hidden">
                 <a class="first" href="#">|<</a><a class="prev" href="#"><</a><span class="nums"><a class="" href="#">1</a><a class="" href="#">2</a> <a class="sel" href="#">3</a><a class="" href="#">4</a>
                 </span><a class="next" href="#">></a><a class="last" href="#">>|</a>
@@ -85,6 +144,7 @@
     <div id="catalog-container" class="hidden">
         <div class="right">
             <button class="back">back</button>
+            <button class="edit">edit</button>
             <button class="print">print</button>
             <button class="checkout">checkout book</button>
         </div>
@@ -92,9 +152,6 @@
             <div class="call_number code">
                 172.23<br>
                 .B632
-            </div>
-            <div class="subject">
-                Presidents-politics and governments 
             </div>
             <div class="book_title title">
                 Presidential Campaign
@@ -163,3 +220,5 @@
     </script>
   </body>
 </html>
+
+

@@ -82,6 +82,83 @@ function loadForm(bookDB, borrowersDB) {
         }
     }
 
+    addBookButton.onclick = () => {
+        dom.hide(searchContainer);
+        generatorForm.show();
+
+        generatorForm.showError("");
+        generatorForm.cancelButton.onclick = () => {
+            dom.show(searchContainer);
+            generatorForm.hide();
+        }
+        generatorForm.submitButton.onclick = () => {
+            let bookInfo = generatorForm.getBookInfo();
+            bookInfo.number_of_copies = 1;
+
+            if (!(bookInfo.book_title || "")) {
+                generatorForm.showError("provide a book title");
+                return;
+            }
+            if (!(bookInfo.call_number || "")) {
+                generatorForm.showError("provide a call number");
+                return;
+            }
+            for (let row of bookDB.table.body) {
+                if (row.call_number == bookInfo.call_number) {
+                    generatorForm.showError("call number is already used");
+                    return;
+                }
+            }
+            generatorForm.clear();
+            bookDB.insert(bookInfo);
+
+            dom.show(searchContainer);
+            generatorForm.hide();
+            searchDB();
+            let matchedPage = pager.lastPage();
+            loadTableRows(matchedPage);
+        }
+    }
+
+    editButton.onclick = () => {
+        dom.hide(searchContainer);
+        dom.hide(catalogContainer);
+        let book = checkoutForm.book;
+        generatorForm.showBook(book);
+        generatorForm.cancelButton.onclick = () => {
+            dom.show(catalogContainer);
+            generatorForm.hide();
+        }
+        generatorForm.showError("");
+        generatorForm.submitButton.onclick = () => {
+            let bookInfo = generatorForm.getBookInfo();
+            for (let row of bookDB.table.body) {
+                if (row == book)
+                    continue;
+                if (row.call_number == bookInfo.call_number) {
+                    generatorForm.showError("call number is already used");
+                    return;
+                }
+            }
+
+            let oldCallNumber = book.call_number;
+            let newCallNumber = bookInfo.call_number;
+            for (let k of Object.keys(bookInfo)) {
+                if (book[k] !== undefined) {
+                    book[k] = bookInfo[k];
+                }
+            }
+
+            bookDB.save();
+            if (oldCallNumber != newCallNumber) {
+                borrowersDB.changeCallNumber(oldCallNumber, newCallNumber);
+            }
+
+            dom.show(catalogContainer);
+            generatorForm.hide();
+        }
+    }
+
     backButton.onclick = () => {
         dom.show(searchContainer);
         dom.hide(catalogContainer);
@@ -356,6 +433,51 @@ function loadForm(bookDB, borrowersDB) {
         }
 
         return {
+            cancelButton: dom.sel("button.cancel", container),
+            submitButton: dom.sel("button.submit", container),
+
+            getBookInfo() {
+                return {
+                    author: [lname, fname].map(f=>f.value).join(", "),
+                    book_title: title.value,
+                    year: year.value,
+                    class_number: classNum.value,
+                    call_number: callNum.value,
+                }
+            },
+
+            showError(text) {
+                dom.sel(".error", container).textContent = text;
+            },
+
+            setBook(book) {
+                let [lastname, firstname] = (book.author||"").split(",").map(s => s.trim());
+                classNum.value =  book.class_number;
+                fname.value = firstname;
+                lname.value = lastname;
+                title.value = book.book_title || "";
+                year.value = book.year || "";
+                if (book.call_number)
+                    callNum.value =  book.call_number;
+            },
+
+            showBook(book) {
+                this.setBook(book);
+                this.show();
+            },
+
+            show() { dom.show(container) },
+            hide() { dom.hide(container) },
+            clear() {
+                fname.value = "";
+                lname.value = "";
+                title.value = "";
+                year.value = "";
+                copyNum.value = "";
+                cutterNum.value = "";
+                callNum.value = "";
+            },
+
             loadDatalist() {
                 datalist.innerHTML = "";
                 for (let [classNum, heading] of Object.entries(summary)) {

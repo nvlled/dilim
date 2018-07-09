@@ -111,6 +111,17 @@ a.bracket::after  { content: "]"; }
 }
 
 /*************************/
+#generator-container label {
+    width: 150px;
+    text-align: right;
+    display: inline-block;
+}
+
+#generator-container input[readonly] {
+    background-color: rgba(30, 30, 30, 0.1);
+}
+
+/*************************/
 
 #header {
     margin: 10px;
@@ -159,6 +170,12 @@ a.bracket::after  { content: "]"; }
 }
 
 
+#generator-container {
+    max-width: 700px;
+    min-height: 200px;
+    margin: 0px auto;
+}
+
 #catalog-container {
     max-width: 700px;
     min-height: 200px;
@@ -182,6 +199,7 @@ a.bracket::after  { content: "]"; }
 #card-catalog .code {
     grid-row: 1 / 4;
     grid-column: 1 / 2;
+    word-spacing: 9999999px; /* break on every space */
 }
 
 #card-catalog .subject {
