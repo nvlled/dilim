@@ -122,6 +122,8 @@ function createPager(pageSize) {
 }
 
 function underscoreCase(str) {
+    if (!str)
+        return "";
     return str.split(/\s+/).join("_").toLowerCase();
 }
 
@@ -135,6 +137,26 @@ function titleCase(str) {
 function firstSheet(workbook) {
     let name = workbook.SheetNames[0];
     return workbook.Sheets[name];
+}
+
+async function intractTable(table, sheet) {
+    for (let row of table.body) {
+        let rowNum = 1;
+        for (let j = 1; j <= table.header.length; j++) {
+
+            let i = row.__rownum__;
+            if (i == null)
+                i = rowNum++;
+
+            let pos = cellpos(i, j);
+            let cell = sheet[pos]
+            let colName = header[j-1];
+            if (!cell) {
+                sheet[pos] = cell = { t: "s" };
+            }
+            cell.v = row[underscoreCase(colName)];
+        }
+    }
 }
 
 async function extractTable(sheet) {
@@ -184,21 +206,23 @@ async function extractTable(sheet) {
             let colName = header[j-1];
             row[j-1] = row[colName] = cell.v;
         }
-        rowNum++;
         if (colcount > 0) {
             // first columns contains the primary key
             index[row[0]] = row;
+            row.__rownum__ = rowNum;
             rows.push(row);
+            rowNum++;
+            return true;
         } else {
             return false;
         }
 
-        return true;
     });
 
     return Promise.resolve({
         header,
         body: rows,
+        rowNum,
         index,
     });
 }
@@ -241,6 +265,7 @@ module.exports = {
     titleCase,
     firstSheet,
     extractTable,
+    intractTable,
     mapNodeText,
     currentDate,
     wordMatch,
