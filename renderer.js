@@ -7,7 +7,6 @@ let {ipcRenderer} = require("electron");
 let fs = Promise.promisifyAll(require("fs"));
 let util = require("./util");
 let api = require("./api");
-let borrowersDB;
 
 let main = async () => {
     if(typeof require !== 'undefined') XLSX = require('xlsx');
@@ -16,20 +15,25 @@ let main = async () => {
         let workbook = XLSX.read(fileContents);
         let sheet1 = util.firstSheet(workbook);
         let table = await util.extractTable(sheet1);
-        console.log(table);
-        borrowersDB = await api.borrowersDB();
-        loadForm(table);
+
+        let [bookDB, borrowersDB] = await Promise.all([
+            await api.bookDB(),
+            await api.borrowersDB(),
+        ]);
+        console.log("bookdb", bookDB);
+        loadForm(bookDB, borrowersDB);
 
     }, 600);
 }
 
 setTimeout(_=> main());
 
-function loadForm(tableData) {
+function loadForm(bookDB, borrowersDB) {
     let loadingContainer = dom.sel("#loading");
     let catalogContainer = document.querySelector("#catalog-container");
     let searchContainer = document.querySelector("#search-container");
     let checkoutContainer = document.querySelector("#checkout-container");
+    let generatorContainer = document.querySelector("#generator-container");
 
     let form = document.querySelector("form#search");
     let searchInput = form.querySelector("input[name=query]");
@@ -37,8 +41,11 @@ function loadForm(tableData) {
     let resultCount = form.querySelector(".result-count .n");
     let table = document.querySelector("table#result");
     let cardCatalog = document.querySelector("#card-catalog");
+
     let backButton = catalogContainer.querySelector("button.back");
     let checkoutButton = catalogContainer.querySelector("button.checkout");
+    let editButton = catalogContainer.querySelector("button.edit");
+    let addBookButton = searchContainer.querySelector("button.add-book");
 
     let pageNav = loadPageNavDom();
     let borrowerTable = loadBorrowerTable();
@@ -52,7 +59,7 @@ function loadForm(tableData) {
 
     dom.hide(loadingContainer);
     dom.show(searchContainer);
-    loadHeader(tableData.header);
+    loadHeader(bookDB.table.header);
     searchDB();
 
     watchFiles();
@@ -145,13 +152,13 @@ function loadForm(tableData) {
 
     async function searchDB() {
         let q = searchInput.value.trim();
-        let type = typeSelect.value || tableData.header[0];
+        let type = typeSelect.value || bookDB.table.header[0];
 
         searchInput.disabled = true;
         let matched = [];
         let exactMatch = dom.sel("input[name=exact]", searchContainer).checked;
         console.log("searching");
-        await util.asyncEach(tableData.body, row => {
+        await util.asyncEach(bookDB.table.body, row => {
             let val = (row[type] || row[0] || "").toString().toLowerCase();
             if (exactMatch && !!q) {
                 if (util.wordMatch(q, val))
@@ -363,7 +370,7 @@ function loadForm(tableData) {
     }
 
     async function loadTableRows(rows) {
-        let header = tableData.header;
+        let header = bookDB.table.header;
         let tbody = table.querySelector("tbody");
         let itemNo = pager.currentItemNo();
 
@@ -407,11 +414,13 @@ function loadForm(tableData) {
                 continue;
 
             let node = catalogContainer.querySelector("."+key);
-            if (!node) {
-                node = document.createElement("div");
-                node.classList.add(key);
-                cardCatalog.appendChild(node);
-            }
+            if (!node)
+                continue;
+            //if (!node) {
+            //    node = document.createElement("div");
+            //    node.classList.add(key);
+            //    cardCatalog.appendChild(node);
+            //}
             node.textContent = val;
         }
 
@@ -458,6 +467,9 @@ function loadForm(tableData) {
         w.add(borrowersDB.filename);
         w.on("change", function(file) {
             if (file == borrowersDB.filename && borrowersDB.saving) {
+                return;
+            }
+            if (file == bookDB.filename && bookDB.saving) {
                 return;
             }
             showNotification(file + " has been changed, reloading...");

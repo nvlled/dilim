@@ -11,23 +11,28 @@ let borrowerSql = `
 `;
 
 let config = {
+    libFile : "lib.xls",
     borrowersFile : "borrowers.xls",
 }
 
-let newXlsBorrowers = async (filename=config.borrowersFile) => {
+let newBookLib = async (filename=config.libFile) => {
     // TODO: load worksheet from file
-    header = ["Call Number", "Borrower", "Date Borrowed", "Date Returned"];
+    let header = ["Call Number", "Book Title", "Author", "Publisher", "Year", "Class Number", "Number Of Copies"];
 
     let table = {
         header: header.map(util.underscoreCase),
         body: [],
     }
 
+    let workbook;
+    let worksheet;
     try {
         let fileContents = await fs.readFileAsync(filename);
-        let workbook = XLSX.read(fileContents);
-        let sheet1 = util.firstSheet(workbook);
-        let loadedTable = await util.extractTable(sheet1);
+        workbook = XLSX.read(fileContents, {
+            cellStyles: true,
+        });
+        worksheet = util.firstSheet(workbook);
+        let loadedTable = await util.extractTable(worksheet);
         if (loadedTable && loadedTable.header.length > 0)
             table = loadedTable;
     } catch (e) {
@@ -39,13 +44,13 @@ let newXlsBorrowers = async (filename=config.borrowersFile) => {
         saving: false,
         filename,
         save(destFilename=filename) {
-            let wb = XLSX.utils.book_new();
             let array = this.toArray();
-            let worksheet = XLSX.utils.aoa_to_sheet(array);
-            console.log(worksheet);
-            XLSX.utils.book_append_sheet(wb, worksheet, "borrowers");
+            workbook = XLSX.utils.book_new();
+            worksheet = XLSX.utils.aoa_to_sheet(array);
+            XLSX.utils.book_append_sheet(workbook, worksheet, "library");
             this.saving = true;
-            XLSX.writeFile(wb, destFilename);
+            XLSX.writeFile(workbook, destFilename, {
+            });
             setTimeout(() => {
                 this.saving = false;
             }, 200);
@@ -61,14 +66,110 @@ let newXlsBorrowers = async (filename=config.borrowersFile) => {
         },
 
         insert(row) {
+            row.__rownum__ = table.rowNum++;
+            let data = [];
+            for (let [i, colname] of Object.entries(table.header)) {
+                row[i] = row[colname];
+                data.push(row[i]);
+            }
+
             table.body.push(row);
+            XLSX.utils.sheet_add_aoa(worksheet, [ data ], {origin: -1});
             this.save();
         },
 
         update(data) {
+            console.log("updating", data);
             this.save();
-            //data can be modified directly
-            //table.index[data[0]] = data;
+        },
+
+        isCallNumberUsed(book) {
+            for (let row of table.body) {
+                if (row.call_number == book.call_number 
+                    && row != book)
+                    return true;
+            }
+            return false;
+        },
+    }
+}
+
+
+let newXlsBorrowers = async (filename=config.borrowersFile) => {
+    // TODO: load worksheet from file
+    let header = ["Call Number", "Borrower", "Date Borrowed", "Date Returned"];
+
+    let table = {
+        header: header.map(util.underscoreCase),
+        body: [],
+    }
+
+    let workbook;
+    let worksheet;
+    try {
+        let fileContents = await fs.readFileAsync(filename);
+        workbook = XLSX.read(fileContents, {
+            cellStyles: true,
+        });
+        worksheet = util.firstSheet(workbook);
+        let loadedTable = await util.extractTable(worksheet);
+        if (loadedTable && loadedTable.header.length > 0)
+            table = loadedTable;
+    } catch (e) {
+        console.log("failed reading borrowers file:" + e);
+    }
+
+    return {
+        table,
+        saving: false,
+        filename,
+        save(destFilename=filename) {
+            let array = this.toArray();
+            workbook = XLSX.utils.book_new();
+            worksheet = XLSX.utils.aoa_to_sheet(array);
+            XLSX.utils.book_append_sheet(workbook, worksheet, "borrowers");
+            this.saving = true;
+            XLSX.writeFile(workbook, destFilename, {
+            });
+            setTimeout(() => {
+                this.saving = false;
+            }, 200);
+        },
+
+        toArray() {
+            let header = table.header;
+            console.log(header);
+            let header_ = header.map(util.titleCase);
+            return [header_].concat(table.body.map(row => {
+                return header.map(h => row[h]);
+            }));
+        },
+
+        insert(row) {
+            row.__rownum__ = table.rowNum++;
+            let data = [];
+            for (let [i, colname] of Object.entries(table.header)) {
+                row[i] = row[colname];
+                data.push(row[i]);
+            }
+
+            table.body.push(row);
+            XLSX.utils.sheet_add_aoa(worksheet, [ data ], {origin: -1});
+            this.save();
+        },
+
+        update(data) {
+            console.log("updating", data);
+            this.save();
+        },
+
+        changeCallNumber(callNumber, newCallNumber) {
+            for (let row of table.body) {
+                if (row.call_number == callNumber) {
+                    row.call_number = newCallNumber;
+                }
+            }
+            this.save();
         },
 
         list(bookId) {
@@ -109,4 +210,5 @@ let newXlsBorrowers = async (filename=config.borrowersFile) => {
 
 module.exports = {
     borrowersDB: newXlsBorrowers,
+    bookDB: newBookLib,
 }
