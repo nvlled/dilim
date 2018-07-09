@@ -14,15 +14,14 @@
   "author": "nvlled",
   "license": "CC0-1.0",
   "devDependencies": {
-    "electron": "^2.0.0"
+    "electron": "^2.0.4"
   },
   "dependencies": {
     "better-sqlite3": "^4.1.4",
     "bluebird": "^3.5.1",
     "chokidar": "^2.0.4",
     "classify2": "0.0.2",
-    "ddcsum": "^1.1.1",
-    "squel": "^5.12.1",
+    "ddcsum": "^1.1.2",
     "xlsx": "^0.12.13"
   }
 }
