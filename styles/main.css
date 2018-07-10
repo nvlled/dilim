@@ -190,6 +190,7 @@ a.bracket::after  { content: "]"; }
     grid-template-columns: 80px repeat(3, 1fr);
     grid-template-rows: repeat(10, 1fr);
     padding: 10px;
+    grid-gap: 10px;
 }
 
 #card-catalog > * {
@@ -236,3 +237,5 @@ footer {
     bottom: 0;
     right: 0;
 }
+
+

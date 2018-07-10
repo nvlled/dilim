@@ -9,18 +9,11 @@ let util = require("./util");
 let api = require("./api");
 
 let main = async () => {
-    if(typeof require !== 'undefined') XLSX = require('xlsx');
     setTimeout(async () => {
-        let fileContents = await fs.readFileAsync("lib.xls");
-        let workbook = XLSX.read(fileContents);
-        let sheet1 = util.firstSheet(workbook);
-        let table = await util.extractTable(sheet1);
-
         let [bookDB, borrowersDB] = await Promise.all([
             await api.bookDB(),
             await api.borrowersDB(),
         ]);
-        console.log("bookdb", bookDB);
         loadForm(bookDB, borrowersDB);
 
     }, 600);
@@ -83,6 +76,7 @@ function loadForm(bookDB, borrowersDB) {
     }
 
     addBookButton.onclick = () => {
+        generatorForm.clear();
         dom.hide(searchContainer);
         generatorForm.show();
 
@@ -156,6 +150,9 @@ function loadForm(bookDB, borrowersDB) {
 
             dom.show(catalogContainer);
             generatorForm.hide();
+            setCatalogContents(bookInfo);
+            checkoutForm.setBook(bookInfo);
+            searchDB();
         }
     }
 
@@ -526,11 +523,7 @@ function loadForm(bookDB, borrowersDB) {
             showCatalog(checkoutForm.book);
     }
 
-    function showCatalog(row) {
-        dom.hide(searchContainer);
-        dom.show(catalogContainer);
-
-        // clear existing entries
+    function setCatalogContents(row) {
         for (let [key, val] of Object.entries(row)) {
             if (key.match(/^\d+$/))
                 continue;
@@ -538,13 +531,15 @@ function loadForm(bookDB, borrowersDB) {
             let node = catalogContainer.querySelector("."+key);
             if (!node)
                 continue;
-            //if (!node) {
-            //    node = document.createElement("div");
-            //    node.classList.add(key);
-            //    cardCatalog.appendChild(node);
-            //}
             node.textContent = val;
         }
+    }
+
+    function showCatalog(row) {
+        dom.hide(searchContainer);
+        dom.show(catalogContainer);
+
+        setCatalogContents(row);
 
         let id = row.call_number
         let availableCopies = borrowersDB.availableCopies(row)
