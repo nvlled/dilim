@@ -53,7 +53,14 @@ function loadForm(bookDB, borrowersDB) {
     dom.hide(loadingContainer);
     dom.show(searchContainer);
     loadHeader(bookDB.table.header);
-    searchDB();
+
+
+    let exclude = ["number_of_copies"];
+    let names = bookDB.table.header.filter(h => {
+        console.log(util.underscoreCase(h));
+        return exclude.indexOf(util.underscoreCase(h)) < 0;
+    })
+    loadTypeSelection(typeSelect, names);
 
     watchFiles();
 
@@ -224,6 +231,17 @@ function loadForm(bookDB, borrowersDB) {
         }).join(" ");
     }
 
+    function loadTypeSelection(sel, names) {
+        sel.innerHTML = "";
+        names.forEach(name => {
+            let opt = dom.create("option");
+            opt.textContent = util.titleCase(name);
+            opt.value = util.underscoreCase(name);
+            sel.appendChild(opt);
+        });
+
+    }
+
     async function searchDB() {
         let q = searchInput.value.trim();
         let type = typeSelect.value || bookDB.table.header[0];
@@ -232,17 +250,21 @@ function loadForm(bookDB, borrowersDB) {
         let matched = [];
         let exactMatch = dom.sel("input[name=exact]", searchContainer).checked;
         console.log("searching");
-        await util.asyncEach(bookDB.table.body, row => {
-            let val = (row[type] || row[0] || "").toString().toLowerCase();
-            if (exactMatch && !!q) {
-                if (util.wordMatch(q, val))
-                    matched.push(row);
-            } else {
-                if (val.match(q.toLowerCase())) {
-                    matched.push(row);
+
+        if (!!q) {
+            await util.asyncEach(bookDB.table.body, row => {
+                let val = (row[type] || row[0] || "").toString().toLowerCase();
+                if (exactMatch) {
+                    if (util.wordMatch(q, val))
+                        matched.push(row);
+                } else {
+                    if (val.match(q.toLowerCase())) {
+                        matched.push(row);
+                    }
                 }
-            }
-        });
+            });
+        }
+
         if (matched.length == 0)
             dom.hide(table.querySelector("thead"));
         else
