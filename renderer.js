@@ -118,6 +118,7 @@ function loadForm(bookDB, borrowersDB) {
             searchDB();
             let matchedPage = pager.lastPage();
             loadTableRows(matchedPage);
+            showNotification("New Book Added: " + bookInfo.book_title);
         }
     }
 
