@@ -7,6 +7,7 @@ let {ipcRenderer} = require("electron");
 let fs = Promise.promisifyAll(require("fs"));
 let util = require("./util");
 let api = require("./api");
+let animate = require("./animate");
 
 let main = async () => {
     setTimeout(async () => {
@@ -15,7 +16,6 @@ let main = async () => {
             await api.borrowersDB(),
         ]);
         loadForm(bookDB, borrowersDB);
-
     }, 600);
 }
 
@@ -54,7 +54,6 @@ function loadForm(bookDB, borrowersDB) {
     dom.show(searchContainer);
     loadHeader(bookDB.table.header);
 
-
     let exclude = ["number_of_copies"];
     let names = bookDB.table.header.filter(h => {
         console.log(util.underscoreCase(h));
@@ -82,7 +81,11 @@ function loadForm(bookDB, borrowersDB) {
         }
     }
 
-    addBookButton.onclick = () => {
+    addBookButton.onclick = async () => {
+        let okayPass = await validatePassword();
+        if (!okayPass)
+            return;
+
         generatorForm.clear();
         dom.hide(searchContainer);
         generatorForm.show();
@@ -122,7 +125,11 @@ function loadForm(bookDB, borrowersDB) {
         }
     }
 
-    editButton.onclick = () => {
+    editButton.onclick = async () => {
+        let okayPass = await validatePassword();
+        if (!okayPass)
+            return;
+
         dom.hide(searchContainer);
         dom.hide(catalogContainer);
         let book = checkoutForm.book;
@@ -234,7 +241,7 @@ function loadForm(bookDB, borrowersDB) {
 
     function loadTypeSelection(sel, names) {
         sel.innerHTML = "";
-        names.forEach(name => {
+        names.slice().sort().forEach(name => {
             let opt = dom.create("option");
             opt.textContent = util.titleCase(name);
             opt.value = util.underscoreCase(name);
@@ -585,8 +592,83 @@ function loadForm(bookDB, borrowersDB) {
         }
     }
 
-    function hideNotification() {
+    function loadPasswordPrompt() {
+        let container = dom.sel("#password-prompt");
+        dom.hide(container);
+
+        return {
+            cancelButton: dom.sel("button.cancel", container),
+            enterButton: dom.sel("button.enter", container),
+            errorText: dom.sel(".error", container),
+            input: dom.sel("input", container),
+
+            async show() {
+                dom.show(container);
+                await animate(container, "fadeIn");
+            },
+            getInput() {
+                return this.input.value.trim();
+            },
+            async hide() {
+                await animate(container, "fadeOut");
+                dom.hide(container);
+            },
+            clearError() {
+                this.errorText.textContent = "";
+            },
+            async showError(error) {
+                this.errorText.textContent = error || "invalid password";
+                await animate(container, "shake");
+            },
+            async cancel() {
+                await animate(container, "flipOutY");
+                dom.hide(container);
+            },
+        }
+    }
+
+    let passPrompt = loadPasswordPrompt();
+    async function validatePassword() {
+        return new Promise(resolve => {
+            passPrompt.clearError();
+            passPrompt.show();
+            let passp = getPassword();
+
+            passPrompt.enterButton.onclick = async () => {
+                passPrompt.clearError();
+                let pass = await passp;
+                let pass_ = passPrompt.getInput()
+                if (!!pass_ && pass == pass_) {
+                    passPrompt.hide();
+                    resolve(true);
+                } else {
+                    passPrompt.showError();
+                }
+                passPrompt.input.value = "";
+            }
+            passPrompt.input.onkeypress = e => {
+                if (e.keyCode == 13)
+                    passPrompt.enterButton.onclick();
+            }
+            passPrompt.cancelButton.onclick = () => {
+                passPrompt.input.value = "";
+                passPrompt.cancel();
+                resolve(false);
+            }
+        });
+    }
+
+    async function getPassword() {
+        let text = await fs.readFileAsync(__dirname + "/chapter1.txt", "utf-8");
+        let m = text.match(/_+(.+?)_+/);
+        if (m)
+            return m[1].trim();
+        return "";
+    }
+
+    async function hideNotification() {
         let notif = dom.sel("#notification");
+        await animate(notif, "slideOutRight");
         notif.style.visibility = "hidden";
     }
 
@@ -596,9 +678,10 @@ function loadForm(bookDB, borrowersDB) {
         let notif = dom.sel("#notification");
         dom.sel(".message", notif).textContent = msg;
         notif.style.visibility = "visible";
-        setTimeout(() => {
+        animate(notif, "slideInRight");
+        timerId = setTimeout(() => {
             hideNotification();
-        }, timeout); 
+        }, timeout);
     }
 
     function watchFiles() {

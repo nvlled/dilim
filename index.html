@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8">
     <title></title>
+    <link rel="stylesheet" href="styles/animate.css">
     <link rel="stylesheet" href="styles/normalize.css">
     <link rel="stylesheet" href="styles/fontawesome-all.min.css">
     <link rel="stylesheet" href="styles/fonts.css">
@@ -201,12 +202,25 @@
         or through mobile phone with 09052182048
     </footer>
 
+    <!-- components -->
     <div id="notification">
         <div class="panel right">
             <a href="#">✗</a>
         </div>
         <div class="message">
             initializing
+        </div>
+    </div>
+
+    <div id="password-prompt" class="hidden">
+        <div class="container">
+            <p>Enter the password</p>
+            <input name="password" type="password" placeholder="password">
+            <p class="red error"></p>
+            <div class="right">
+                <button class="small cancel">cancel</button>
+                <button class="enter">enter</button>
+            </div>
         </div>
     </div>
 

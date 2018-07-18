@@ -256,7 +256,18 @@ function compareSort(k, obj1, obj2) {
     return -1;
 }
 
+function once(fn) {
+    let executed = false;
+    return (...args) => {
+        if (executed)
+            return null;
+        executed = true;
+        return fn(...args);
+    }
+}
+
 module.exports = {
+    once,
     cellpos,
     asyncLoop,
     asyncEach,
