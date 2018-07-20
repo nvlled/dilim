@@ -270,3 +270,35 @@ footer {
     background-color: #222;
 }
 
+#options {
+    position: fixed;
+    background-color: rgba(20, 20, 20, 0.9);
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: grid;
+    justify-content: center;
+    justify-items: center;
+    align-content: center;
+    align-items: center;
+}
+
+#options .container {
+    height: 50vh;
+    width: 50vw;
+    overflow-y: scroll;
+}
+
+ul.no-bullet li {
+    list-style-type: none;
+}
+
+#navbar {
+    background-color: rgba(80, 60, 30, 0.5);
+    padding: 3px;
+}
+#navbar > *{
+    padding-left: 11px;
+}
+

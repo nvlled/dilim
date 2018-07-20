@@ -28,6 +28,7 @@ function loadForm(bookDB, borrowersDB) {
     let searchContainer = document.querySelector("#search-container");
     let checkoutContainer = document.querySelector("#checkout-container");
     let generatorContainer = document.querySelector("#generator-container");
+    let configContainer = document.querySelector("#config-container");
 
     let form = document.querySelector("form#search");
     let searchInput = form.querySelector("input[name=query]");
@@ -39,12 +40,14 @@ function loadForm(bookDB, borrowersDB) {
     let backButton = catalogContainer.querySelector("button.back");
     let checkoutButton = catalogContainer.querySelector("button.checkout");
     let editButton = catalogContainer.querySelector("button.edit");
-    let addBookButton = searchContainer.querySelector("button.add-book");
+    let addBookButton = document.querySelector(".add-book");
+    let showConfigButton = document.querySelector(".add-book");
 
     let pageNav = loadPageNavDom();
     let borrowerTable = loadBorrowerTable();
     let checkoutForm = loadCheckoutForm(checkoutContainer);
     let generatorForm = loadCallNumGenForm(generatorContainer);
+    let configForm = loadConfigForm(configContainer);
     let pager = util.createPager(30);
 
     generatorForm.loadDatalist();
@@ -79,6 +82,10 @@ function loadForm(bookDB, borrowersDB) {
             e.preventDefault();
             searchDB();
         }
+    }
+
+    showConfigButton.onclick = async() => {
+        // TODO
     }
 
     addBookButton.onclick = async () => {
@@ -414,6 +421,12 @@ function loadForm(bookDB, borrowersDB) {
                     this.nums.appendChild(a);
                 }
             },
+        }
+    }
+
+    function loadConfigForm(container) {
+        return {
+            // TODO
         }
     }
 

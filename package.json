@@ -1,6 +1,6 @@
 {
   "name": "dilim",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "digital library management",
   "main": "main.js",
   "scripts": {
