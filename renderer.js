@@ -165,8 +165,8 @@ function loadForm(bookDB, borrowersDB) {
 
             dom.show(catalogContainer);
             generatorForm.hide();
-            setCatalogContents(bookInfo);
-            checkoutForm.setBook(bookInfo);
+            book = util.assignValues(checkoutForm.book, bookInfo);
+            showCatalog(book);
             searchDB();
         }
     }
