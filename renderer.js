@@ -56,7 +56,6 @@ function loadForm(bookDB, borrowersDB) {
 
     let exclude = ["number_of_copies"];
     let names = bookDB.table.header.filter(h => {
-        console.log(util.underscoreCase(h));
         return exclude.indexOf(util.underscoreCase(h)) < 0;
     })
     loadTypeSelection(typeSelect, names);
@@ -424,6 +423,8 @@ function loadForm(bookDB, borrowersDB) {
         let fname = dom.sel("input.firstname", container);
         let lname = dom.sel("input.lastname", container);
         let heading = dom.sel("input.ddc-heading", container);
+        let subject = dom.sel(".subject", container);
+        let numCopies = dom.sel(".num-copies", container);
         let title = dom.sel("input.title", container);
         let year = dom.sel("input.year", container);
         let copyNum = dom.sel("input.copy-num", container);
@@ -443,7 +444,6 @@ function loadForm(bookDB, borrowersDB) {
                 publishYear: year.value,
                 author: { lastname, firstname },
             }
-            console.log("args", args);
             callNum.value = ddcsum.generateCallNumber(args);
         }
 
@@ -464,12 +464,18 @@ function loadForm(bookDB, borrowersDB) {
             submitButton: dom.sel("button.submit", container),
 
             getBookInfo() {
+                var copies = +numCopies.value.trim();
+                if (isNaN(copies))
+                    copies = 0;
+
                 return {
                     author: [lname, fname].map(f=>f.value).join(", "),
-                    book_title: title.value,
-                    year: year.value,
-                    class_number: classNum.value,
-                    call_number: callNum.value,
+                    book_title: title.value.trim(),
+                    year: year.value.trim(),
+                    class_number: classNum.value.trim(),
+                    call_number: callNum.value.trim(),
+                    subject: subject.value.trim(),
+                    number_of_copies: copies,
                 }
             },
 
@@ -484,6 +490,8 @@ function loadForm(bookDB, borrowersDB) {
                 lname.value = lastname;
                 title.value = book.book_title || "";
                 year.value = book.year || "";
+                subject.value = book.subject || "";
+                numCopies.value = book.number_of_copies || 0;
                 if (book.call_number)
                     callNum.value =  book.call_number;
             },
@@ -503,6 +511,8 @@ function loadForm(bookDB, borrowersDB) {
                 copyNum.value = "";
                 cutterNum.value = "";
                 callNum.value = "";
+                subject.value = "";
+                numCopies.value = "";
             },
 
             loadDatalist() {
@@ -514,7 +524,6 @@ function loadForm(bookDB, borrowersDB) {
                     datalist.appendChild(opt);
                 }
             },
-
         }
     }
 
