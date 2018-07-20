@@ -8,6 +8,7 @@ let fs = Promise.promisifyAll(require("fs"));
 let util = require("./util");
 let api = require("./api");
 let animate = require("./animate");
+const process = require("process");
 
 let main = async () => {
     setTimeout(async () => {
@@ -639,6 +640,11 @@ function loadForm(bookDB, borrowersDB) {
     let passPrompt = loadPasswordPrompt();
     async function validatePassword() {
         return new Promise(resolve => {
+            if (!authorizeAccess()) {
+                resolve(true);
+                return;
+            }
+
             passPrompt.clearError();
             passPrompt.show();
             let passp = getPassword();
@@ -665,6 +671,12 @@ function loadForm(bookDB, borrowersDB) {
                 resolve(false);
             }
         });
+    }
+
+    function authorizeAccess() {
+        if (process.env.DILIM_NOPASS)
+            return false;
+        return true;
     }
 
     async function getPassword() {
