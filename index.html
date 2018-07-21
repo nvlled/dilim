@@ -15,7 +15,7 @@
         <a href="#" class="add-book">
             <i class="fas fa-book"></i>
         </a>
-        <a href="#" class="add-book">
+        <a href="#" class="show-settings hidden">
             <i class="fas fa-cog"></i>
         </a>
     </div>
@@ -74,10 +74,6 @@
             <label class="hidden ">Copy Number</label>
             <input class="hidden copy-num" placeholder="" size="2">
         </div>
-        <div>
-            <label>Number of copies</label>
-            <input class="num-copies" placeholder="" size="2">
-        </div>
         <br>
         <div>
             <label>Cutter Number</label>
@@ -86,6 +82,17 @@
         <div>
             <label>Call Number</label>
             <input class="call-num" placeholder="―" size="35">
+        </div>
+        <br>
+        <div>
+            <label>Number of copies</label>
+            <input class="num-copies" placeholder="" size="1">
+        </div>
+        <div>
+            <label>Ebook/Soft Copy</label>
+            <input class="hidden filename" type="file" accept=".pdf" size="10">
+            <span class="filename"></span>
+            <button class="small browse-file">browse</button>
         </div>
         <br>
         <div>
@@ -171,7 +178,22 @@
             <div class="publisher">
                 University Press
             </div>
+            <div class="subject">
+                University Press
+            </div>
         </div>
+
+        <div class="pdf-viewer-container">
+            <input type="hidden" name="pdf-filename">
+            <div class="buttons">
+                <span class="error">file not found: ajsdifajsdf</span>
+                <a class="action back" href="#">return</a>
+                <a class="action download" href="#">download</a>
+                <a class="action view" href="#">view</a>
+            </div>
+            <iframe id="pdf-viewer" src="./pdfjs/web/viewer.html"></iframe>
+        </div>
+
         <div class="copies-available right">
             <div>Available copies:
                 <span class="avail_copies n">0</span>
@@ -207,12 +229,9 @@
     <div class="pre-footer"></div>
     <footer>
         Initial Prototype for Cayambanan National Highschool
-
-        <br><br>
-
+        <br>
         Designed and created by Ronald Casili (github.com/nvlled)<br>
-        For inquiries, contact through email with nvlled@gmail.com <br>
-        or through mobile phone with 09052182048
+        For inquiries, contact through nvlled@gmail.com or 9052182048.
     </footer>
 
     <!-- components -->

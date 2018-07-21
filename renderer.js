@@ -36,6 +36,8 @@ function loadForm(bookDB, borrowersDB) {
     let resultCount = form.querySelector(".result-count .n");
     let table = document.querySelector("table#result");
     let cardCatalog = document.querySelector("#card-catalog");
+    let pdfViewerContainer = document.querySelector(".pdf-viewer-container");
+    let pdfViewerFrame = document.querySelector("iframe#pdf-viewer");
 
     let backButton = catalogContainer.querySelector("button.back");
     let checkoutButton = catalogContainer.querySelector("button.checkout");
@@ -53,6 +55,7 @@ function loadForm(bookDB, borrowersDB) {
     generatorForm.loadDatalist();
     initNotification();
     hideNotification();
+    setupPdfViewer(pdfViewerContainer);
 
     dom.hide(loadingContainer);
     dom.show(searchContainer);
@@ -159,20 +162,15 @@ function loadForm(bookDB, borrowersDB) {
 
             let oldCallNumber = book.call_number;
             let newCallNumber = bookInfo.call_number;
-            for (let k of Object.keys(bookInfo)) {
-                if (book[k] !== undefined) {
-                    book[k] = bookInfo[k];
-                }
-            }
-
+            book = util.assignValues(checkoutForm.book, bookInfo);
             bookDB.save();
+
             if (oldCallNumber != newCallNumber) {
                 borrowersDB.changeCallNumber(oldCallNumber, newCallNumber);
             }
 
             dom.show(catalogContainer);
             generatorForm.hide();
-            book = util.assignValues(checkoutForm.book, bookInfo);
             showCatalog(book);
             searchDB();
         }
@@ -439,10 +437,13 @@ function loadForm(bookDB, borrowersDB) {
         let heading = dom.sel("input.ddc-heading", container);
         let subject = dom.sel(".subject", container);
         let numCopies = dom.sel(".num-copies", container);
+        let filenameInput = dom.sel("input.filename", container);
+        let filenameText = dom.sel("span.filename", container);
         let title = dom.sel("input.title", container);
         let year = dom.sel("input.year", container);
         let copyNum = dom.sel("input.copy-num", container);
         let datalist = dom.sel("datalist", container);
+        let browseFileBtn = dom.sel("button.browse-file", container);
 
         let ddcsum = require("ddcsum");
         let summary = ddcsum.data;
@@ -459,6 +460,13 @@ function loadForm(bookDB, borrowersDB) {
                 author: { lastname, firstname },
             }
             callNum.value = ddcsum.generateCallNumber(args);
+        }
+
+        browseFileBtn.onclick = () => {
+            filenameInput.click();
+        }
+        filenameInput.onchange = () => {
+            filenameText.textContent = filenameInput.files[0].path.trim();
         }
 
         fname.onchange = generate;
@@ -482,6 +490,9 @@ function loadForm(bookDB, borrowersDB) {
                 if (isNaN(copies))
                     copies = 0;
 
+                let file = filenameInput.files[0];
+                let filename = file ? file.path : filenameText.textContent;
+
                 return {
                     author: [lname, fname].map(f=>f.value).join(", "),
                     book_title: title.value.trim(),
@@ -490,6 +501,7 @@ function loadForm(bookDB, borrowersDB) {
                     call_number: callNum.value.trim(),
                     subject: subject.value.trim(),
                     number_of_copies: copies,
+                    filename,
                 }
             },
 
@@ -506,6 +518,7 @@ function loadForm(bookDB, borrowersDB) {
                 year.value = book.year || "";
                 subject.value = book.subject || "";
                 numCopies.value = book.number_of_copies || 0;
+                filenameText.textContent = book.filename || "";
                 if (book.call_number)
                     callNum.value =  book.call_number;
             },
@@ -605,6 +618,72 @@ function loadForm(bookDB, borrowersDB) {
         
         borrowerTable.setRows(borrowers);
         checkoutForm.setBook(row);
+
+        showPdfFile(row.filename);
+    }
+
+    async function showPdfFile(filename) {
+        let container = pdfViewerFrame.parentNode;
+        let filenameInput = dom.sel("input[name=pdf-filename]", container);
+
+        container.classList.remove("not-found");
+        if (!filename) {
+            dom.hide(container);
+            return;
+        }
+
+        dom.show(container);
+        try {
+            let blob = await fs.readFileAsync(filename);
+            dom.show(pdfViewerFrame);
+            pdfViewerFrame.contentWindow.PDFViewerApplication.open(blob);
+            filenameInput.value = filename;
+        } catch (e) {
+            container.classList.add("not-found");
+            dom.sel(".error", container).textContent = `file is missing or unreadable: ${filename}`;
+            dom.hide(pdfViewerFrame);
+            filenameInput.value = "";
+        }
+    }
+
+    function setupPdfViewer(container) {
+        let footer = dom.sel("footer");
+        let {dialog} = require("electron").remote;
+        dom.sel(".back", container).onclick = function(e) {
+            e.preventDefault();
+            container.classList.remove("full");
+            dom.show(footer);
+        }
+        dom.sel(".view", container).onclick = function(e) {
+            e.preventDefault();
+            container.classList.add("full");
+            dom.hide(footer);
+        }
+
+        let isSaving = false;
+        dom.sel(".download", container).onclick = function(e) {
+            e.preventDefault();
+            if (isSaving)
+                return;
+            dialog.showSaveDialog({
+                filters: [
+                    { name: "pdf", extensions: ["pdf"]},
+                ]
+            }, async filename => {
+                if (!filename)
+                    return;
+                isSaving = true;
+                e.target.classList.add("loading");
+
+                let srcFilename = dom.sel("input[name=pdf-filename]").value;
+                let blob = await fs.readFileAsync(srcFilename);
+                fs.writeFileAsync(filename, blob);
+                showNotification(`file saved to ${filename}`);
+
+                e.target.classList.remove("loading");
+                isSaving = false;
+            });
+        }
     }
 
     function initNotification() {
