@@ -1,6 +1,7 @@
 
 Promise = require("bluebird");
 let fs = Promise.promisifyAll(require("fs"));
+const toml = require("@iarna/toml");
 const util = require('./util');
 const XLSX = require('xlsx');
 
@@ -208,7 +209,21 @@ let newXlsBorrowers = async (filename=config.borrowersFile) => {
     }
 }
 
+async function loadConfig() {
+    let filename = "./config.toml";
+    let contents = await fs.readFileAsync(filename, "utf-8");
+    try {
+        let config = await toml.parse.async(contents);
+        return config;
+    } catch (e) {
+        console.error("failed to load config: " + e);
+        return {};
+    }
+}
+
+
 module.exports = {
+    loadConfig,
     borrowersDB: newXlsBorrowers,
     bookDB: newBookLib,
 }

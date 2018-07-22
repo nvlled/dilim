@@ -17,6 +17,7 @@
     "electron": "^2.0.4"
   },
   "dependencies": {
+    "@iarna/toml": "^1.7.1",
     "better-sqlite3": "^4.1.4",
     "bluebird": "^3.5.1",
     "chokidar": "^2.0.4",

@@ -1,0 +1,6 @@
+
+hideColumns = [
+    "Number of copies",
+    "filename",
+    "call number",
+]

@@ -12,17 +12,18 @@ const process = require("process");
 
 let main = async () => {
     setTimeout(async () => {
-        let [bookDB, borrowersDB] = await Promise.all([
+        let [bookDB, borrowersDB, config] = await Promise.all([
             await api.bookDB(),
             await api.borrowersDB(),
+            await api.loadConfig(),
         ]);
-        loadForm(bookDB, borrowersDB);
+        loadForm(bookDB, borrowersDB, config);
     }, 600);
 }
 
 setTimeout(_=> main());
 
-function loadForm(bookDB, borrowersDB) {
+function loadForm(bookDB, borrowersDB, config) {
     let loadingContainer = dom.sel("#loading");
     let catalogContainer = document.querySelector("#catalog-container");
     let searchContainer = document.querySelector("#search-container");
@@ -59,13 +60,8 @@ function loadForm(bookDB, borrowersDB) {
 
     dom.hide(loadingContainer);
     dom.show(searchContainer);
-    loadHeader(bookDB.table.header);
 
-    let exclude = ["number_of_copies"];
-    let names = bookDB.table.header.filter(h => {
-        return exclude.indexOf(util.underscoreCase(h)) < 0;
-    })
-    loadTypeSelection(typeSelect, names);
+    loadTypeSelection(typeSelect, bookDB.table.header);
 
     watchFiles();
 
@@ -248,6 +244,7 @@ function loadForm(bookDB, borrowersDB) {
     }
 
     function loadTypeSelection(sel, names) {
+        names = exclude(names, config.hideColumns);
         sel.innerHTML = "";
         names.slice().sort().forEach(name => {
             let opt = dom.create("option");
@@ -567,10 +564,23 @@ function loadForm(bookDB, borrowersDB) {
         }
     }
 
+    function exclude(array, exclist) {
+        if (!exclist)
+            return array;
+        array = array.map(util.underscoreCase);
+        exclist = exclist.map(util.underscoreCase);
+        return array.filter(x => {
+            return exclist.indexOf(x) < 0;
+        });
+    }
+
     async function loadTableRows(rows) {
-        let header = bookDB.table.header;
         let tbody = table.querySelector("tbody");
         let itemNo = pager.currentItemNo();
+        let header = bookDB.table.header;
+
+        header = exclude(header, config.hideColumns);
+        loadHeader(header);
 
         await util.asyncEach(rows, (row, i) => {
             let tr = document.createElement("tr");
