@@ -32,7 +32,6 @@ let animate = (el, ...names)  => {
     el.classList.add("animated");
     for (let name of names)
         el.classList.add(name);
-    console.log("animating", names, el);
 
     return new Promise((resolve, reject) => {
         let handler = e => {

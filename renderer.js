@@ -102,6 +102,7 @@ function loadForm(bookDB, borrowersDB) {
 
         generatorForm.showError("");
         generatorForm.cancelButton.onclick = () => {
+            dom.hide(catalogContainer);
             dom.show(searchContainer);
             generatorForm.hide();
         }
@@ -126,12 +127,14 @@ function loadForm(bookDB, borrowersDB) {
             generatorForm.clear();
             bookDB.insert(bookInfo);
 
-            dom.show(searchContainer);
-            generatorForm.hide();
             searchDB();
             let matchedPage = pager.lastPage();
             loadTableRows(matchedPage);
             showNotification("New Book Added: " + bookInfo.book_title);
+
+            dom.show(searchContainer);
+            generatorForm.hide();
+            dom.hide(catalogContainer);
         }
     }
 
@@ -362,6 +365,12 @@ function loadForm(bookDB, borrowersDB) {
             table,
             setRows(rows) {
                 this.clear();
+                if (rows.length == 0) {
+                    dom.hide(table);
+                    return;
+                }
+
+                dom.show(table);
                 rows.forEach(function(row) {
                     let tr = trTempl.cloneNode(true);
                     util.mapNodeText(tr, row);
@@ -512,6 +521,7 @@ function loadForm(bookDB, borrowersDB) {
             setBook(book) {
                 let [lastname, firstname] = (book.author||"").split(",").map(s => s.trim());
                 classNum.value =  book.class_number;
+                heading.value = summary[book.class_number] || "";
                 fname.value = firstname;
                 lname.value = lastname;
                 title.value = book.book_title || "";
@@ -521,6 +531,7 @@ function loadForm(bookDB, borrowersDB) {
                 filenameText.textContent = book.filename || "";
                 if (book.call_number)
                     callNum.value =  book.call_number;
+                cutterNum.value = ddcsum.generateCutterNumber(lastname, firstname); 
             },
 
             showBook(book) {
@@ -540,6 +551,8 @@ function loadForm(bookDB, borrowersDB) {
                 callNum.value = "";
                 subject.value = "";
                 numCopies.value = "";
+                classNum.value = "";
+                filenameText.value = "";
             },
 
             loadDatalist() {
@@ -653,11 +666,13 @@ function loadForm(bookDB, borrowersDB) {
             e.preventDefault();
             container.classList.remove("full");
             dom.show(footer);
+            document.body.style.overflowY = ""
         }
         dom.sel(".view", container).onclick = function(e) {
             e.preventDefault();
             container.classList.add("full");
             dom.hide(footer);
+            document.body.style.overflowY = "hidden"
         }
 
         let isSaving = false;
