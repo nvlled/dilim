@@ -443,6 +443,7 @@ function loadForm(bookDB, borrowersDB, config) {
         let lname = dom.sel("input.lastname", container);
         let heading = dom.sel("input.ddc-heading", container);
         let subject = dom.sel(".subject", container);
+        let publisher = dom.sel(".publisher", container);
         let numCopies = dom.sel(".num-copies", container);
         let filenameInput = dom.sel("input.filename", container);
         let filenameText = dom.sel("span.filename", container);
@@ -518,6 +519,7 @@ function loadForm(bookDB, borrowersDB, config) {
                     class_number: classNum.value.trim(),
                     call_number: callNum.value.trim(),
                     subject: subject.value.trim(),
+                    publisher: publisher.value.trim(),
                     number_of_copies: copies,
                     filename,
                 }
@@ -536,6 +538,7 @@ function loadForm(bookDB, borrowersDB, config) {
                 title.value = book.book_title || "";
                 year.value = book.year || "";
                 subject.value = book.subject || "";
+                publisher.value = book.publisher  || "";
                 numCopies.value = book.number_of_copies || 0;
                 filenameText.textContent = book.filename || "";
                 if (book.call_number)
@@ -562,13 +565,16 @@ function loadForm(bookDB, borrowersDB, config) {
                 lname.value = "";
                 title.value = "";
                 year.value = "";
+                heading.value = "";
                 copyNum.value = "";
                 cutterNum.value = "";
                 callNum.value = "";
                 subject.value = "";
+                publisher.value = "";
                 numCopies.value = "";
                 classNum.value = "";
                 filenameText.textContent = "";
+                dom.hide(removeFileBtn);
             },
 
             loadDatalist() {
