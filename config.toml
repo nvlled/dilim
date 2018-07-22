@@ -3,4 +3,5 @@ hideColumns = [
     "Number of copies",
     "filename",
     "call number",
+    "class number",
 ]

@@ -93,6 +93,7 @@
             <label>Ebook/Soft Copy</label>
             <input class="hidden filename" type="file" accept=".pdf" size="10">
             <span class="filename"></span>
+            <a href="#" class="action remove-file">x</a>
             <button class="small browse-file">browse</button>
         </div>
         <br>
@@ -192,7 +193,7 @@
                 <a class="action download" href="#">download</a>
                 <a class="action view" href="#">view</a>
             </div>
-            <iframe id="pdf-viewer" src="./pdfjs/web/viewer.html"></iframe>
+            <iframe id="pdf-viewer" src="./pdfjs/web/viewer.html?file="></iframe>
         </div>
 
         <div class="copies-available right">

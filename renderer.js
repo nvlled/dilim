@@ -172,6 +172,7 @@ function loadForm(bookDB, borrowersDB, config) {
             generatorForm.hide();
             showCatalog(book);
             searchDB();
+            showNotification(`book updated: ${book.book_title}`);
         }
     }
 
@@ -450,6 +451,7 @@ function loadForm(bookDB, borrowersDB, config) {
         let copyNum = dom.sel("input.copy-num", container);
         let datalist = dom.sel("datalist", container);
         let browseFileBtn = dom.sel("button.browse-file", container);
+        let removeFileBtn = dom.sel("a.remove-file", container);
 
         let ddcsum = require("ddcsum");
         let summary = ddcsum.data;
@@ -468,11 +470,21 @@ function loadForm(bookDB, borrowersDB, config) {
             callNum.value = ddcsum.generateCallNumber(args);
         }
 
+        removeFileBtn.onclick = () => {
+            filenameInput.value = "";
+            filenameText.textContent = "";
+        }
         browseFileBtn.onclick = () => {
             filenameInput.click();
         }
         filenameInput.onchange = () => {
-            filenameText.textContent = filenameInput.files[0].path.trim();
+            let filename = filenameInput.files[0].path.trim();
+            if (filename) {
+                dom.show(removeFileBtn)
+                filenameText.textContent = filename;
+            } else {
+                dom.hide(removeFileBtn)
+            }
         }
 
         fname.onchange = generate;
@@ -529,6 +541,13 @@ function loadForm(bookDB, borrowersDB, config) {
                 if (book.call_number)
                     callNum.value =  book.call_number;
                 cutterNum.value = ddcsum.generateCutterNumber(lastname, firstname); 
+
+                if (book.filename) {
+                    dom.show(removeFileBtn)
+                    filenameText.textContent = book.filename;
+                } else {
+                    dom.hide(removeFileBtn)
+                }
             },
 
             showBook(book) {
@@ -549,7 +568,7 @@ function loadForm(bookDB, borrowersDB, config) {
                 subject.value = "";
                 numCopies.value = "";
                 classNum.value = "";
-                filenameText.value = "";
+                filenameText.textContent = "";
             },
 
             loadDatalist() {

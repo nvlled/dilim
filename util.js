@@ -269,7 +269,7 @@ function once(fn) {
 function assignValues(dest, src) {
     if (!dest)
         return src;
-    for (let k of Object.keys(dest)) {
+    for (let k of Object.keys(src)) {
         dest[k] = src[k];
     }
     return dest;
