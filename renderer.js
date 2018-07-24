@@ -17,6 +17,11 @@ let main = async () => {
             await api.borrowersDB(),
             await api.loadConfig(),
         ]);
+
+        if (config.noAnimation) {
+            animate.disabled = true;
+        }
+
         loadForm(bookDB, borrowersDB, config);
     }, 600);
 }

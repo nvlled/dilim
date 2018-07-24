@@ -18,6 +18,9 @@ let animationEnd = (function (el) {
 let endSym = Symbol("animate end");
 let nameSym = Symbol("animation names");
 let animate = (el, ...names)  => {
+    if (animate.disabled)
+        return;
+
     if (typeof el == "string") {
         el = document.querySelector(el);
     }
@@ -48,5 +51,6 @@ let animate = (el, ...names)  => {
         el[nameSym] = names;
     });
 }
+animate.disabled = false;
 
 module.exports = animate;

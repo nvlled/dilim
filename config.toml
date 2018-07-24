@@ -5,3 +5,5 @@ hideColumns = [
     "call number",
     "class number",
 ]
+
+noAnimation = true
