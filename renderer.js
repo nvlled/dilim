@@ -184,6 +184,8 @@ function loadForm(bookDB, borrowersDB, config) {
     backButton.onclick = () => {
         dom.show(searchContainer);
         dom.hide(catalogContainer);
+        pdfViewerFrame.src = "";
+        pdfViewerFrame.contentWindow.reload();
     }
 
     checkoutButton.onclick = () => {
@@ -685,17 +687,22 @@ function loadForm(bookDB, borrowersDB, config) {
             return;
         }
 
-        dom.show(container);
-        try {
-            let blob = await fs.readFileAsync(filename);
-            dom.show(pdfViewerFrame);
-            pdfViewerFrame.contentWindow.PDFViewerApplication.open(blob);
-            filenameInput.value = filename;
-        } catch (e) {
-            container.classList.add("not-found");
-            dom.sel(".error", container).textContent = `file is missing or unreadable: ${filename}`;
-            dom.hide(pdfViewerFrame);
-            filenameInput.value = "";
+        pdfViewerFrame.src = "./pdfjs/web/viewer.html";
+        console.log("setting src to " + pdfViewerFrame);
+        pdfViewerFrame.onload = async () => {
+
+            dom.show(container);
+            try {
+                let blob = await fs.readFileAsync(filename);
+                dom.show(pdfViewerFrame);
+                pdfViewerFrame.contentWindow.PDFViewerApplication.open(blob);
+                filenameInput.value = filename;
+            } catch (e) {
+                container.classList.add("not-found");
+                dom.sel(".error", container).textContent = `file is missing or unreadable: ${filename}`;
+                dom.hide(pdfViewerFrame);
+                filenameInput.value = "";
+            }
         }
     }
 
