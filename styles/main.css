@@ -130,6 +130,14 @@ a.bracket::after  { content: "]"; }
     background-color: rgba(30, 30, 30, 0.1);
 }
 
+#generator-container .filename {
+    width: 350px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+}
+
 /*************************/
 
 #header {
